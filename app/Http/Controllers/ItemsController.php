@@ -25,14 +25,25 @@ class ItemsController extends Controller
         $item = new Items();
         $item->name = $request->name;
         $item->cost = $request->cost;
+        $item->price = $request->price;
+
         if ($request->sold) {
             $item->sold_price = $request->sold_price;
             $item->shipping_cost = $request->shipping_cost;
             $item->shipping_price = $request->shipping_price;
-            $item->sold_at = $request->sold_at;
+            $item->shipping_at = date('Y-m-d', strtotime($request->shipping_at));;
+            $item->sold_at = date('Y-m-d', strtotime($request->sold_at));
+            $item->country_code = $request->country;
+            $item->city = $request->city;
+            $item->state = $request->state;
+            $item->zipcode = $request->zipcode;
         }
 
         $item->save();
+        return $this->create();
+    }
+
+    public function search(Request $request) {
         return $this->create();
     }
 }

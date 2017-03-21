@@ -19,3 +19,5 @@ Route::get('/',
     ['as' => 'items', 'uses' => 'ItemsController@create']);
 Route::post('/',
     ['as' => 'items', 'uses' => 'ItemsController@store']);
+Route::post('/search',
+    ['as' => 'items', 'uses' => 'ItemsController@search']);

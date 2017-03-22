@@ -95,4 +95,5 @@
             <input type="submit" class="btn btn-default">
         </div>
     </div>
+    <hr>
 </form>

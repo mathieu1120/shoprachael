@@ -13,6 +13,8 @@
 
 Route::post('/search',
     ['as' => 'items', 'uses' => 'ItemsController@search']);
+Route::get('/search',
+    ['as' => 'items', 'uses' => 'ItemsController@search']);
 Route::get('/',
     ['as' => 'items', 'uses' => 'ItemsController@create']);
 Route::post('/',

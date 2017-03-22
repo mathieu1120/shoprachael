@@ -8,13 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class ItemsController extends Controller
 {
-    public function create() {
+    public function create(Request $request) {
 
-        $items = Items::where('status', 1)
-            ->orderBy('name', 'desc')
-            ->get();
-
-        return view('items', ['items' => $items]);
+        return $this->search($request);
     }
 
     public function store(Request $request) {
@@ -43,7 +39,30 @@ class ItemsController extends Controller
         return $this->create();
     }
 
-    public function search(Request $request) {
-        return $this->create();
+    public function search(Request $request = null) {
+        $param = [];
+        $paramOr = [];
+        $param[] = ['status', 1];
+        if (!empty($request->has('name'))) {
+            $param[] = ['name', $request->input('name')];
+        }
+        if (!empty($request->has('location'))) {
+            $paramOr[] = ['state', $request->input('location')];
+            $paramOr[] = ['country_code', $request->input('location')];
+            $paramOr[] = ['city', $request->input('location')];
+            $paramOr[] = ['zipcode', $request->input('location')];
+        }
+
+        $sql = Items::where($param);
+        if ($paramOr) {
+            $sql->where(function($q) use ($paramOr) {
+                foreach ($paramOr as $p) {
+                    $q->orWhere([$p]);
+                }
+            });
+        }
+
+        $items = $sql->orderBy('created_at', 'desc')->get();
+        return view('items', ['items' => $items, 'request' => $request]);
     }
 }

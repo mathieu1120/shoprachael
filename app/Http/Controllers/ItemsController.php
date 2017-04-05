@@ -63,6 +63,28 @@ class ItemsController extends Controller
         }
 
         $items = $sql->orderBy('created_at', 'desc')->get();
-        return view('items', ['items' => $items, 'request' => $request]);
+        $tableStats = $this->getTableStats($items);
+
+        return view('items', ['items' => $items, 'tableStats' => $tableStats, 'request' => $request]);
+    }
+
+    private function getTableStats($items) {
+        $tableStats = [
+            'cost' => 0,
+            'price' => 0,
+            'shipping_cost' => 0,
+            'shipping_price' => 0,
+            'sold_price' => 0
+        ];
+
+        foreach ($items as $item) {
+            $tableStats['cost'] += $item->cost ?: 0;
+            $tableStats['price'] += $item->price ?: 0;
+            $tableStats['shipping_cost'] += $item->shipping_cost ?: 0;
+            $tableStats['shipping_price'] += $item->shipping_price ?: 0;
+            $tableStats['sold_price'] += $item->sold_price ?: 0;
+        }
+
+        return $tableStats;
     }
 }

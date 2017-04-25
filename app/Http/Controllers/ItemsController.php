@@ -36,7 +36,7 @@ class ItemsController extends Controller
         }
 
         $item->save();
-        return $this->create();
+        return $this->create($request);
     }
 
     public function search(Request $request = null) {

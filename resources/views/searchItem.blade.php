@@ -1,4 +1,5 @@
-<div>
+<a data-toggle="collapse" href="#form-search-item">Search Item</a>
+<div id="form-search-item" class="collapse">
     <form class="form-inline mt-10" method="post" action="/search">
         {{ csrf_field() }}
         <div class="form-group">

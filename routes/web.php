@@ -15,7 +15,15 @@ Route::post('/search',
     ['as' => 'items', 'uses' => 'ItemsController@search']);
 Route::get('/search',
     ['as' => 'items', 'uses' => 'ItemsController@search']);
+
 Route::get('/',
-    ['as' => 'items', 'uses' => 'ItemsController@create']);
+    ['as' => 'items', 'uses' => 'ItemsController@search']);
+
 Route::post('/',
     ['as' => 'items', 'uses' => 'ItemsController@store']);
+
+Route::post('/edit',
+    ['as' => 'items', 'uses' => 'ItemsController@edit']);
+
+Route::delete('/delete',
+    ['as' => 'items', 'uses' => 'ItemsController@delete']);

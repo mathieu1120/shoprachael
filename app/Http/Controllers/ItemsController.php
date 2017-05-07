@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Search;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Items;
@@ -51,8 +52,8 @@ class ItemsController extends Controller
             $item->sold_price = 0;
             $item->shipping_cost = 0;
             $item->shipping_price = 0;
-            $item->shipping_at = "0000-00-00";
-            $item->sold_at =  "0000-00-00";
+            $item->shipping_at = null;
+            $item->sold_at = null;
             $item->country_code = '';
             $item->city = '';
             $item->state = '';
@@ -67,15 +68,49 @@ class ItemsController extends Controller
         $param = [];
         $paramOr = [];
         $param[] = ['status', 1];
+
+        $search = new Search($request ? $request->request->all() : null);
+
         if (!empty($request)) {
             if (!empty($request->has('name'))) {
-                $param[] = ['name', $request->input('name')];
+                $names = explode(' ', $request->input('name'));
+                foreach ($names as $name)
+                $paramOr[] = ['name', 'like', '%'.$name.'%'];
             }
-            if (!empty($request->has('location'))) {
-                $paramOr[] = ['state', $request->input('location')];
-                $paramOr[] = ['country_code', $request->input('location')];
-                $paramOr[] = ['city', $request->input('location')];
-                $paramOr[] = ['zipcode', $request->input('location')];
+            if (!empty($request->has('created_at_from'))) {
+                $param[] = ['created_at', '>=', $request->input('created_at_from')];
+            }
+            if (!empty($request->has('created_at_to'))) {
+                $param[] = ['created_at', '<=', $request->input('created_at_to')];
+            }
+            if (!empty($request->has('shipping_at_from'))) {
+                $param[] = ['shipping_at', '>=', $request->input('shipping_at_from')];
+            }
+            if (!empty($request->has('shipping_at_to'))) {
+                $param[] = ['shipping_at', '<=', $request->input('shipping_at_to')];
+            }
+            if (!empty($request->has('sold_at_from'))) {
+                $param[] = ['sold_at', '>=', $request->input('sold_at_from')];
+            }
+            if (!empty($request->has('sold_at_to'))) {
+                $param[] = ['sold_at', '<=', $request->input('sold_at_to')];
+            }
+
+            if (!empty($request->has('sold'))) {
+                $param[] = ['sold_at', '>', '0000-00-00'];
+            }
+
+            if (!empty($request->has('state'))) {
+                $paramOr[] = ['state', $request->input('state')];
+            }
+            if (!empty($request->has('country'))) {
+                $paramOr[] = ['country_code', $request->input('country')];
+            }
+            if (!empty($request->has('city'))) {
+                $paramOr[] = ['city', $request->input('city')];
+            }
+            if (!empty($request->has('zipcode'))) {
+                $paramOr[] = ['zipcode', $request->input('zipcode')];
             }
         } else {
             $request = new Request();
@@ -93,7 +128,7 @@ class ItemsController extends Controller
         $items = $sql->orderBy('created_at', 'desc')->get();
         $tableStats = $this->getTableStats($items);
 
-        return view('items', ['items' => $items, 'tableStats' => $tableStats, 'request' => $request]);
+        return view('items', ['items' => $items, 'search' => $search, 'tableStats' => $tableStats, 'request' => $request]);
     }
 
     private function getTableStats($items) {

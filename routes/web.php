@@ -11,19 +11,33 @@
 |
 */
 
-Route::post('/search',
-    ['as' => 'items', 'uses' => 'ItemsController@search']);
-Route::get('/search',
-    ['as' => 'items', 'uses' => 'ItemsController@search']);
+use App\Http\Middleware\RedirectIfAuthenticated;
 
-Route::get('/',
-    ['as' => 'items', 'uses' => 'ItemsController@search']);
+Route::group([
+    'middleware' => [
+        'auth',
+        \App\Http\Middleware\AdminVerify::class
+    ]], function () {
+    Route::post('/search',
+        ['as' => 'items', 'uses' => 'ItemsController@search']);
+    Route::get('/search',
+        ['as' => 'items', 'uses' => 'ItemsController@search']);
 
-Route::post('/',
-    ['as' => 'items', 'uses' => 'ItemsController@store']);
+    Route::get('/',
+        ['as' => 'items', 'uses' => 'ItemsController@search']);
 
-Route::post('/edit',
-    ['as' => 'items', 'uses' => 'ItemsController@edit']);
+    Route::post('/',
+        ['as' => 'items', 'uses' => 'ItemsController@store']);
 
-Route::delete('/delete',
-    ['as' => 'items', 'uses' => 'ItemsController@delete']);
+    Route::post('/edit',
+        ['as' => 'items', 'uses' => 'ItemsController@edit']);
+
+    Route::delete('/delete',
+        ['as' => 'items', 'uses' => 'ItemsController@delete']);
+});
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index');
+
+Route::get('/visitor', 'HomeController@visitor');

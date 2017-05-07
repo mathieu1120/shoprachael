@@ -6,7 +6,7 @@ use App\Group;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class RedirectIfAuthenticated
+class AdminVerify
 {
     /**
      * Handle an incoming request.
@@ -18,9 +18,14 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-
-        if (Auth::guard($guard)->check()) {
-            return redirect('/');
+        $user = $request->user();
+        if (empty($user->id)) {
+            return redirect('/home');
+        }
+        $userGroup = Group::find($user->group_id);
+        $groupAdmin = Group::find(Group::ADMIN);
+        if ($userGroup->privilege < $groupAdmin->privilege) {
+            return redirect('/visitor');
         }
         return $next($request);
     }
